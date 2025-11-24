@@ -116,11 +116,12 @@ export const useTimelineStore = create<TimelineState>()(
           updated.start = Math.max(0, updated.end - 0.5);
           updated.end = updated.start + 0.5;
         }
-        
+
         return updated;
       });
-      
+
       set({ segments: updatedSegments });
+      get().saveToHistory(updatedSegments);
     },
 
     removeSegment: (id) => {
