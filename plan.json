@@ -1,0 +1,353 @@
+{
+  "product": "SermonClipper",
+  "version": "1.0",
+  "description": "Multi-segment sermon highlight generator with transitions and YouTube publishing.",
+  "modules": [
+    {
+      "id": "module_1",
+      "name": "Project Initialization",
+      "submodules": [
+        {
+          "id": "module_1_1",
+          "name": "Repository Setup",
+          "tasks": [
+            "Create backend/, frontend/, worker/ directories",
+            "Initialize Git repository",
+            "Create .env.example file",
+            "Define folder structure and base README"
+          ],
+          "deliverables": [
+            "Project scaffold",
+            "Environment variables template",
+            "Initial repository structure"
+          ]
+        },
+        {
+          "id": "module_1_2",
+          "name": "Tech Stack Configuration",
+          "tasks": [
+            "Install FastAPI, Supabase client, Redis, Celery",
+            "Install Next.js in frontend",
+            "Install FFmpeg and yt-dlp bindings",
+            "Create docker-compose.yml for API, worker, Redis",
+            "Verify health checks for all services"
+          ],
+          "deliverables": [
+            "requirements.txt",
+            "docker-compose.yml",
+            "Verified local development environment"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_2",
+      "name": "YouTube Ingestion",
+      "submodules": [
+        {
+          "id": "module_2_1",
+          "name": "Metadata Fetch Endpoint",
+          "tasks": [
+            "Create POST /ingest endpoint in FastAPI",
+            "Validate YouTube URL",
+            "Fetch metadata using YouTube Data API",
+            "Extract title, description, duration, thumbnails, captions_available",
+            "Return structured response"
+          ],
+          "deliverables": [
+            "Ingest endpoint",
+            "YouTube metadata schema",
+            "Error handling"
+          ]
+        },
+        {
+          "id": "module_2_2",
+          "name": "Supabase Video Metadata Storage",
+          "tasks": [
+            "Create videos table",
+            "Store user_id, youtube_id, title, duration, metadata_json",
+            "Create ORM models",
+            "Insert metadata from ingest"
+          ],
+          "deliverables": [
+            "Supabase migrations",
+            "DB table for storing metadata"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_3",
+      "name": "Multi-Segment Clip Selection",
+      "submodules": [
+        {
+          "id": "module_3_1",
+          "name": "Segment Data Structure",
+          "tasks": [
+            "Create clip_jobs and clip_segments tables",
+            "Create Pydantic models",
+            "Validate start < end and duration bound",
+            "API endpoint to save segments"
+          ],
+          "deliverables": [
+            "DB schema for segments",
+            "Segment validation logic",
+            "API routes"
+          ]
+        },
+        {
+          "id": "module_3_2",
+          "name": "Frontend Timeline Editor",
+          "tasks": [
+            "Create draggable start/end markers",
+            "Allow adding/removing segments",
+            "Enable reordering segments",
+            "Display duration of each segment",
+            "Send segment list to backend"
+          ],
+          "deliverables": [
+            "Next.js timeline UI",
+            "Segment list component",
+            "API integration"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_4",
+      "name": "Processing Pipeline (Trimming)",
+      "submodules": [
+        {
+          "id": "module_4_1",
+          "name": "Download Source Video",
+          "tasks": [
+            "Create Celery task to download video using yt-dlp",
+            "Ensure MP4 output",
+            "Store temporarily",
+            "Delete after processing"
+          ],
+          "deliverables": [
+            "download_video_task.py",
+            "Local temp folder structure"
+          ]
+        },
+        {
+          "id": "module_4_2",
+          "name": "Trim Segments",
+          "tasks": [
+            "Use ffmpeg -ss start -to end -c copy for fast trimming",
+            "Fallback to re-encode if necessary",
+            "Save output as partN.mp4",
+            "Store references in DB"
+          ],
+          "deliverables": [
+            "trim_segments_task.py",
+            "List of trimmed parts"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_5",
+      "name": "Transition Engine",
+      "submodules": [
+        {
+          "id": "module_5_1",
+          "name": "Transition Options",
+          "tasks": [
+            "Define allowed transitions: fade, fadeblack, crossfade, slide, zoom, wipe, cut, auto",
+            "Create frontend dropdown for transitions",
+            "Pass transition type to worker"
+          ],
+          "deliverables": [
+            "Transition selector UI",
+            "Backend transition enum"
+          ]
+        },
+        {
+          "id": "module_5_2",
+          "name": "FFmpeg Transition Logic",
+          "tasks": [
+            "Implement ffmpeg filter_complex templates",
+            "Build dynamic transition concat command",
+            "Ensure audio-video sync",
+            "Write merge_with_transitions task"
+          ],
+          "deliverables": [
+            "ffmpeg_transition_builder.py",
+            "merge_with_transitions_task.py"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_6",
+      "name": "Final Highlight Generation",
+      "submodules": [
+        {
+          "id": "module_6_1",
+          "name": "Merge Segments",
+          "tasks": [
+            "Generate final highlight video",
+            "Upload to cloud storage",
+            "Store output_url in DB",
+            "Cleanup temp files"
+          ],
+          "deliverables": [
+            "generate_highlight_task.py",
+            "Final highlight file URL"
+          ]
+        },
+        {
+          "id": "module_6_2",
+          "name": "Branding Engine (Optional)",
+          "tasks": [
+            "Add logo overlay",
+            "Support lower-thirds",
+            "Add intro/outro injection"
+          ],
+          "deliverables": [
+            "Branding configuration settings",
+            "FFmpeg branding command"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_7",
+      "name": "Preview & Publishing",
+      "submodules": [
+        {
+          "id": "module_7_1",
+          "name": "Preview API",
+          "tasks": [
+            "Create GET /job/{id} status endpoint",
+            "Return preview URL, duration, transitions",
+            "Frontend player integration"
+          ],
+          "deliverables": [
+            "Job preview endpoint",
+            "Preview UI"
+          ]
+        },
+        {
+          "id": "module_7_2",
+          "name": "YouTube Upload",
+          "tasks": [
+            "Implement OAuth 2.0 flow",
+            "Use resumable upload API",
+            "Allow user to set metadata",
+            "Handle tokens securely"
+          ],
+          "deliverables": [
+            "publish_to_youtube_task.py",
+            "POST /publish endpoint"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_8",
+      "name": "Pricing & Limits",
+      "submodules": [
+        {
+          "id": "module_8_1",
+          "name": "Free Tier Restrictions",
+          "tasks": [
+            "Enforce 2 highlights/month",
+            "Allow only fade transition",
+            "Apply watermark"
+          ],
+          "deliverables": [
+            "Free tier policy middleware"
+          ]
+        },
+        {
+          "id": "module_8_2",
+          "name": "Paid Tier",
+          "tasks": [
+            "Allow unlimited highlights",
+            "Enable all transitions",
+            "Enable faster queue",
+            "Enable Shorts mode"
+          ],
+          "deliverables": [
+            "Subscription-aware feature gating"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_9",
+      "name": "Monitoring, Logs, Error Handling",
+      "submodules": [
+        {
+          "id": "module_9_1",
+          "name": "Worker Logs",
+          "tasks": [
+            "Store logs per job",
+            "Expose log endpoint",
+            "Display logs in dashboard"
+          ],
+          "deliverables": [
+            "Job logs table",
+            "Error messages UI"
+          ]
+        },
+        {
+          "id": "module_9_2",
+          "name": "Metrics",
+          "tasks": [
+            "Track processing time",
+            "Track failure rate",
+            "Track queue throughput"
+          ],
+          "deliverables": [
+            "Monitoring dashboard",
+            "Analytics schema"
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "module_10",
+      "name": "AI Intelligence Layer (Phase 3)",
+      "submodules": [
+        {
+          "id": "module_10_1",
+          "name": "AI Auto-Clip Detection",
+          "tasks": [
+            "Use transcript & audio amplitude",
+            "Suggest key timestamps",
+            "Recommend clip segments"
+          ],
+          "deliverables": [
+            "AI-powered highlight suggester"
+          ]
+        },
+        {
+          "id": "module_10_2",
+          "name": "AI Auto Titles & Descriptions",
+          "tasks": [
+            "Generate YouTube titles",
+            "Generate descriptions",
+            "Generate hashtags",
+            "Extract Bible references"
+          ],
+          "deliverables": [
+            "AI metadata generator"
+          ]
+        }
+      ]
+    }
+  ]
+}
