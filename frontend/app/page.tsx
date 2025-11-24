@@ -14,7 +14,11 @@ export default function Page() {
       </header>
 
       <div style={{ display: 'grid', gap: 16 }}>
-        <SegmentTimeline videoId="demo-video-id" videoDuration={sampleVideoDuration} />
+        <SegmentTimeline
+          userId="demo-user"
+          youtubeId="demo-video-id"
+          videoDuration={sampleVideoDuration}
+        />
         <JobPreviewPanel jobId="demo-job-id" />
         <PublishForm userId="demo-user" jobId="demo-job-id" apiBaseUrl="" />
       </div>

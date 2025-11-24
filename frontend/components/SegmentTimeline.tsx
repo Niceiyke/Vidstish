@@ -52,8 +52,15 @@ const transitionOptions: Record<'free' | 'paid', TransitionOption[]> = {
   ]
 };
 
-const mapToPayload = (videoId: string, segments: Segment[], transition: string, plan: 'free' | 'paid') => ({
-  video_id: videoId,
+const mapToPayload = (
+  userId: string,
+  youtubeId: string,
+  segments: Segment[],
+  transition: string,
+  plan: 'free' | 'paid'
+) => ({
+  user_id: userId,
+  youtube_id: youtubeId,
   plan,
   transition,
   segments: segments.map((segment, order) => ({
@@ -64,13 +71,15 @@ const mapToPayload = (videoId: string, segments: Segment[], transition: string, 
 });
 
 export type SegmentTimelineProps = {
-  videoId: string;
+  userId: string;
+  youtubeId: string;
   videoDuration: number;
   apiBaseUrl?: string;
 };
 
 export function SegmentTimeline({
-  videoId,
+  userId,
+  youtubeId,
   videoDuration,
   apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
 }: SegmentTimelineProps) {
@@ -137,7 +146,7 @@ export function SegmentTimeline({
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(mapToPayload(videoId, segments, transition, plan))
+        body: JSON.stringify(mapToPayload(userId, youtubeId, segments, transition, plan))
       });
 
       if (!response.ok) {

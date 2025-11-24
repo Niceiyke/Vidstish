@@ -6,7 +6,7 @@ import SegmentTimeline from '../components/SegmentTimeline';
 describe('SegmentTimeline', () => {
   it('allows adding and removing segments', async () => {
     const user = userEvent.setup();
-    render(<SegmentTimeline videoId="video-1" videoDuration={120} />);
+    render(<SegmentTimeline userId="user-1" youtubeId="video-1" videoDuration={120} />);
 
     expect(screen.getAllByTestId('segment-row')).toHaveLength(1);
 
@@ -23,7 +23,7 @@ describe('SegmentTimeline', () => {
 
   it('reorders segments with move buttons', async () => {
     const user = userEvent.setup();
-    render(<SegmentTimeline videoId="video-1" videoDuration={200} />);
+    render(<SegmentTimeline userId="user-1" youtubeId="video-1" videoDuration={200} />);
 
     await act(async () => {
       await user.click(screen.getByLabelText('Add segment'));
@@ -41,7 +41,7 @@ describe('SegmentTimeline', () => {
 
   it('updates duration labels when bounds change', async () => {
     const user = userEvent.setup();
-    render(<SegmentTimeline videoId="video-1" videoDuration={300} />);
+    render(<SegmentTimeline userId="user-1" youtubeId="video-1" videoDuration={300} />);
 
     const endInput = screen.getAllByLabelText(/End input/)[0] as HTMLInputElement;
     await act(async () => {
@@ -58,7 +58,7 @@ describe('SegmentTimeline', () => {
       new Response(JSON.stringify({ clip_job_id: '123' }), { status: 200 })
     );
 
-    render(<SegmentTimeline videoId="video-5" videoDuration={90} />);
+    render(<SegmentTimeline userId="user-5" youtubeId="video-5" videoDuration={90} />);
     await act(async () => {
       await user.click(screen.getByRole('button', { name: /save segments/i }));
     });
@@ -74,6 +74,11 @@ describe('SegmentTimeline', () => {
       })
     );
 
+    const [, requestInit] = fetchMock.mock.calls[0];
+    const body = (requestInit as RequestInit).body?.toString() || '';
+    expect(body).toContain('"user_id":"user-5"');
+    expect(body).toContain('"youtube_id":"video-5"');
+
     fetchMock.mockRestore();
   });
 
@@ -82,7 +87,7 @@ describe('SegmentTimeline', () => {
       new Response(JSON.stringify({ clip_job_id: '123' }), { status: 200 })
     );
 
-    render(<SegmentTimeline videoId="video-5" videoDuration={90} />);
+    render(<SegmentTimeline userId="user-5" youtubeId="video-5" videoDuration={90} />);
 
     const transitionSelect = screen.getByLabelText('Transition selector') as HTMLSelectElement;
     expect(transitionSelect.options).toHaveLength(1);
@@ -109,7 +114,7 @@ describe('SegmentTimeline', () => {
       new Response(JSON.stringify({ clip_job_id: '123' }), { status: 200 })
     );
 
-    render(<SegmentTimeline videoId="video-5" videoDuration={90} />);
+    render(<SegmentTimeline userId="user-5" youtubeId="video-5" videoDuration={90} />);
 
     const planSelect = screen.getByLabelText('Plan selector');
     fireEvent.change(planSelect, { target: { value: 'paid' } });
